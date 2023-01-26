@@ -1,0 +1,37 @@
+[tool.poetry]
+name = "textual-terminal"
+version = "0.2.0"
+description = "A terminal emulator widget for Textual."
+authors = ["Mischa Schindowski <mschindowski@gmail.com>"]
+readme = "README.md"
+license = "LGPL-3.0-or-later"
+packages = [{include = "textual_terminal"}]
+repository = "https://github.com/mitosch/textual-terminal"
+keywords = ["textual", "textual terminal", "textual terminal emulator", "textual subprocess"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Operating System :: Microsoft :: Windows :: Windows 10",
+    "Operating System :: Microsoft :: Windows :: Windows 11",
+    "Operating System :: MacOS",
+    "Operating System :: POSIX :: Linux",
+]
+include = [
+    "LICENSE.md",
+]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+textual = ">=0.8.0"
+pyte = "^0.8.1"
+
+[tool.poetry.group.dev.dependencies]
+textual = { version = ">=0.8.0", extras = ["dev"] }
+pytest = "^7.2.0"
+pytest-cov = "^4.0.0"
+pytest-asyncio = "^0.20.3"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
