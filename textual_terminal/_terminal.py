@@ -7,6 +7,9 @@ https://github.com/selectel/pyte/blob/master/examples/terminal_emulator.py
 
 from __future__ import annotations
 
+# FIXME: app crashes when hitting Alt+e and other keys
+# TODO: do not show cursor when widget is not focused
+
 import os
 import fcntl
 import signal
@@ -151,6 +154,14 @@ class Terminal(Widget, can_focus=True):
 
     async def on_key(self, event: events.Key) -> None:
         if self.emulator is None:
+            return
+
+        if event.key == "ctrl+f1":
+            # release focus from widget: because event.stop() follows, releasing
+            # focus would not be possible without mouse click.
+            #
+            # OPTIMIZE: make the key to release focus configurable
+            self.app.set_focus(None)
             return
 
         event.stop()
