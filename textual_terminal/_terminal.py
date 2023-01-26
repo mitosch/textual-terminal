@@ -152,6 +152,9 @@ class Terminal(Widget, can_focus=True):
         return self._display
 
     async def on_key(self, event: events.Key) -> None:
+        if self.emulator is None:
+            return
+
         event.stop()
         char = self.ctrl_keys.get(event.key) or event.character
         if char:
@@ -167,18 +170,27 @@ class Terminal(Widget, can_focus=True):
         self._screen.resize(self.nrow, self.ncol)
 
     async def on_click(self, event: events.MouseEvent):
+        if self.emulator is None:
+            return
+
         if self.mouse_tracking is False:
             return
 
         await self.send_queue.put(["click", event.x, event.y, event.button])
 
     async def on_mouse_scroll_down(self, event: events.MouseScrollDown):
+        if self.emulator is None:
+            return
+
         if self.mouse_tracking is False:
             return
 
         await self.send_queue.put(["scroll", "down", event.x, event.y])
 
     async def on_mouse_scroll_up(self, event: events.MouseScrollUp):
+        if self.emulator is None:
+            return
+
         if self.mouse_tracking is False:
             return
 

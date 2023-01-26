@@ -5,8 +5,8 @@ An example how to use the Terminal widget with bash and htop
 from __future__ import annotations
 
 from textual.app import App, ComposeResult
-from textual.widgets import Header, Footer, Button, Static, Placeholder
-from textual.containers import Horizontal, Vertical
+from textual.widgets import Header, Footer, Static, Placeholder
+from textual.containers import Vertical
 from textual.css.query import NoMatches
 
 from textual import log
