@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "textual-terminal"
-version = "0.2.1"
+version = "0.2.2"
 description = "A terminal emulator widget for Textual."
 authors = ["Mischa Schindowski <mschindowski@gmail.com>"]
 readme = "README.md"

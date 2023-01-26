@@ -7,7 +7,7 @@ https://github.com/selectel/pyte/blob/master/examples/terminal_emulator.py
 
 from __future__ import annotations
 
-# FIXME: app crashes when hitting Alt+e and other keys
+# FIXME: when hitting Alt+e, app is waiting for any stdin (output not shown)
 # TODO: do not show cursor when widget is not focused
 
 import os
@@ -90,21 +90,21 @@ class Terminal(Widget, can_focus=True):
 
         # OPTIMIZE: check a way to use textual.keys
         self.ctrl_keys = {
-            "left": "\u001b[D",
-            "right": "\u001b[C",
-            "up": "\u001b[A",
-            "down": "\u001b[B",
-            "home": "\u001b[H",
-            "delete": "\u001b[3~",
-            "end": "\u001b[4~",
-            "pageup": "\u001b[5~",
-            "pagedown": "\u001b[6~",
-            "shift+tab": "\u001b[Z",
-            "f1": "\x1b[[A",
-            "f2": "\x1b[[B",
-            "f3": "\x1b[[C",
-            "f4": "\x1b[[D",
-            "f5": "\x1b[[E",
+            "up": "\x1bOA",
+            "down": "\x1bOB",
+            "right": "\x1bOC",
+            "left": "\x1bOD",
+            "home": "\x1bOH",
+            "end": "\x1b[F",
+            "delete": "\x1b[3~",
+            "pageup": "\x1b[5~",
+            "pagedown": "\x1b[6~",
+            "shift+tab": "\x1b[Z",
+            "f1": "\x1bOP",
+            "f2": "\x1bOQ",
+            "f3": "\x1bOR",
+            "f4": "\x1bOS",
+            "f5": "\x1b[15~",
             "f6": "\x1b[17~",
             "f7": "\x1b[18~",
             "f8": "\x1b[19~",
@@ -122,7 +122,6 @@ class Terminal(Widget, can_focus=True):
             "f20": "\x1b[34~",
         }
         self._display = self.initial_display()
-        # self._screen = pyte.Screen(self.ncol, self.nrow)
         self._screen = TerminalPyteScreen(self.ncol, self.nrow)
         self.stream = pyte.Stream(self._screen)
 
