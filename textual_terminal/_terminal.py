@@ -5,8 +5,6 @@ Based on David Brochart's pyte example:
 https://github.com/selectel/pyte/blob/master/examples/terminal_emulator.py
 """
 
-# TODO: implement mouse scrolling
-
 from __future__ import annotations
 
 import os
@@ -298,8 +296,7 @@ class TerminalEmulator:
     def __init__(self, command: str):
         # FIXME: fix ResourceWarning (manually close the fd / p_out broke (blocking)
         """
-        The following error happens on self.fd, when stopping the emulator
-        and starting again:
+        The following error happens on self.fd, when stopping the emulator with stop():
 
         ResourceWarning: unclosed file <_io.FileIO name=8 mode='rb+' closefd=True>
 
