@@ -5,7 +5,7 @@ A terminal widget for [Textual](https://github.com/Textualize/textual) using
 
 Textual application example with two terminal widgets:
 
-IMG
+![textual_terminal_example](https://user-images.githubusercontent.com/922559/214794889-4d376da1-6aa9-4576-a01d-0beee2536e41.png)
 
 ## Usage
 
