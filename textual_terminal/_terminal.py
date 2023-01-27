@@ -7,6 +7,7 @@ https://github.com/selectel/pyte/blob/master/examples/terminal_emulator.py
 
 from __future__ import annotations
 
+# TODO: use textual background
 # FIXME: when hitting Alt+e, app is waiting for any stdin (output not shown)
 # TODO: do not show cursor when widget is not focused
 
@@ -31,8 +32,10 @@ from rich.color import ColorParseError
 
 from textual.widget import Widget
 from textual import events
+from textual.app import DEFAULT_COLORS
 
 from textual import log
+from textual.design import ColorSystem
 
 
 class TerminalPyteScreen(pyte.Screen):
@@ -76,6 +79,11 @@ class Terminal(Widget, can_focus=True):
         classes: str | None = None,
     ) -> None:
         self.command = command
+
+        # XXX: use textual background
+        color_system: ColorSystem = DEFAULT_COLORS["dark"]
+        self.textual_colors = color_system.generate()
+        log(self.app.dark)
 
         # default size, will be adapted on_resize
         self.ncol = 80
@@ -265,14 +273,20 @@ class Terminal(Widget, can_focus=True):
 
     def define_style(self, char: Char) -> Style | None:
         # OPTIMIZE: refactor from rich-style per character to string changing style
-        if char.fg == "default" and char.bg == "default":
-            return None
+        # if char.fg == "default" and char.bg == "default":
+        #     return None
+
+        # XXX: use textual background
+        background = self.fix_color(char.bg)
+        if background == "default":
+            background = self.textual_colors["background"]
 
         style: Style
         try:
             style = Style(
                 color=self.fix_color(char.fg),
-                bgcolor=self.fix_color(char.bg),
+                # bgcolor=self.fix_color(char.bg),
+                bgcolor=background,
                 bold=char.bold,
             )
         except ColorParseError as error:
