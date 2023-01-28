@@ -58,7 +58,7 @@ class TerminalDisplay:
             yield line
 
 
-_re_ansi_sequence = re.compile(r'(\x1b\[\??[\d;]*[a-zA-Z])')
+_re_ansi_sequence = re.compile(r"(\x1b\[\??[\d;]*[a-zA-Z])")
 DECSET_PREFIX = "\x1b[?"
 
 
@@ -83,7 +83,7 @@ class Terminal(Widget, can_focus=True):
         # XXX: use textual background
         color_system: ColorSystem = DEFAULT_COLORS["dark"]
         self.textual_colors = color_system.generate()
-        log(self.app.dark)
+        # log(self.app.dark)
 
         # default size, will be adapted on_resize
         self.ncol = 80
@@ -245,18 +245,28 @@ class Terminal(Widget, can_focus=True):
                         log.warning("could not feed:", error)
 
                     lines = []
+                    last_char: Char
+                    last_style: Style
                     for y in range(self._screen.lines):
                         line_text = Text()
                         line = self._screen.buffer[y]
+                        style_change_pos: int = 0
                         for x in range(self._screen.columns):
                             char: Char = line[x]
 
-                            style = self.define_style(char)
-                            line_text.append(char.data, style=style)
+                            line_text.append(char.data)
+
+                            # if style changed, stylize it with rich
+                            if x > 0:
+                                last_char = line[x - 1]
+                                if not self.char_style_cmp(char, last_char) or x == self._screen.columns - 1:
+                                    last_style = self.char_rich_style(last_char)
+                                    line_text.stylize(last_style, style_change_pos, x + 1)
+                                    style_change_pos = x
 
                             if (
-                                self._screen.cursor.x == x and
-                                self._screen.cursor.y == y
+                                self._screen.cursor.x == x
+                                and self._screen.cursor.y == y
                             ):
                                 line_text.stylize("reverse", x, x + 1)
 
@@ -271,10 +281,14 @@ class Terminal(Widget, can_focus=True):
             # log.warning("Terminal.recv cancelled")
             pass
 
-    def define_style(self, char: Char) -> Style | None:
+    def char_rich_style(self, char: Char) -> Style:
+        """Returns a rich.Style from the pyte.Char."""
         # OPTIMIZE: refactor from rich-style per character to string changing style
         # if char.fg == "default" and char.bg == "default":
         #     return None
+
+        # if not self.char_style_default(char):
+        #     log("char:", char)
 
         # XXX: use textual background
         background = self.fix_color(char.bg)
@@ -285,8 +299,8 @@ class Terminal(Widget, can_focus=True):
         try:
             style = Style(
                 color=self.fix_color(char.fg),
-                # bgcolor=self.fix_color(char.bg),
-                bgcolor=background,
+                # bgcolor=background,
+                bgcolor=self.fix_color(char.bg),
                 bold=char.bold,
             )
         except ColorParseError as error:
@@ -296,6 +310,43 @@ class Terminal(Widget, can_focus=True):
             log.warning("color parse error:", error)
 
         return style
+
+    def char_style_cmp(self, given: Char, other: Char) -> bool:
+        """Compares two pyte.Chars and returns if these are the same.
+
+        Returns:
+            True    if char styles are the same
+            False   if char styles differ
+        """
+        if (
+            given.fg == other.fg
+            and given.bg == other.bg
+            and given.bold == other.bold
+            and given.italics == other.italics
+            and given.underscore == other.underscore
+            and given.strikethrough == other.strikethrough
+            and given.reverse == other.reverse
+            and given.blink == other.blink
+        ):
+            return True
+
+        return False
+
+    def char_style_default(self, char: Char) -> bool:
+        """Returns True if the given char has a default style."""
+        if (
+            char.fg == "default"
+            and char.bg == "default"
+            and char.bold is False
+            and char.italics is False
+            and char.underscore is False
+            and char.strikethrough is False
+            and char.reverse is False
+            and char.blink is False
+        ):
+            return True
+
+        return False
 
     def fix_color(self, color: str) -> str:
         """Fix wrong ANSI color names.
