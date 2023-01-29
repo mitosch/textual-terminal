@@ -1,3 +1,4 @@
+
 # Textual: Terminal
 
 A terminal widget for [Textual](https://github.com/Textualize/textual) using
@@ -5,8 +6,8 @@ A terminal widget for [Textual](https://github.com/Textualize/textual) using
 
 <details><summary>Textual application example with two terminal widgets:</summary>
 
-![textual_terminal_example](https://user-images.githubusercontent.com/922559/214794889-4d376da1-6aa9-4576-a01d-0beee2536e41.png)
-
+![textual_terminal](https://user-images.githubusercontent.com/922559/215332972-79db9e52-7688-4353-9fc1-11ccdd2ec36f.png)
+    
 </details>
 
 ## Usage
