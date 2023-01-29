@@ -5,7 +5,6 @@ A terminal widget for [Textual](https://github.com/Textualize/textual) using
 
 <details><summary>Textual application example with two terminal widgets:</summary>
 
-    
 ![textual_terminal_example](https://user-images.githubusercontent.com/922559/214794889-4d376da1-6aa9-4576-a01d-0beee2536e41.png)
 
 </details>
@@ -46,8 +45,8 @@ pip install textual-terminal
 ### `default_colors`
 
 By default, textual-terminal uses the colors defined by the system (not the
-Textual colors). To use the textual background and foreground for "default"
-colors, set the option `default_colors`
+Textual colors). To use the Textual background and foreground colors for
+"default" ANSI colors, set the option `default_colors` to `textual`:
 
 ```python
 Terminal(command="htop", default_colors="textual")
