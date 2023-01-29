@@ -7,7 +7,6 @@ https://github.com/selectel/pyte/blob/master/examples/terminal_emulator.py
 
 from __future__ import annotations
 
-# TODO: use textual background
 # FIXME: when hitting Alt+e, app is waiting for any stdin (output not shown)
 # TODO: do not show cursor when widget is not focused
 
@@ -71,19 +70,21 @@ class Terminal(Widget, can_focus=True):
     }
     """
 
+    textual_colors: dict | None
+
     def __init__(
         self,
         command: str,
+        default_colors: str | None = "system",
         name: str | None = None,
         id: str | None = None,
         classes: str | None = None,
     ) -> None:
         self.command = command
+        self.default_colors = default_colors
 
-        # XXX: use textual background
-        color_system: ColorSystem = DEFAULT_COLORS["dark"]
-        self.textual_colors = color_system.generate()
-        # log(self.app.dark)
+        if default_colors == "textual":
+            self.textual_colors = self.detect_textual_colors()
 
         # default size, will be adapted on_resize
         self.ncol = 80
@@ -283,31 +284,25 @@ class Terminal(Widget, can_focus=True):
 
     def char_rich_style(self, char: Char) -> Style:
         """Returns a rich.Style from the pyte.Char."""
-        # OPTIMIZE: refactor from rich-style per character to string changing style
-        # if char.fg == "default" and char.bg == "default":
-        #     return None
 
-        # if not self.char_style_default(char):
-        #     log("char:", char)
-
-        # XXX: use textual background
-        background = self.fix_color(char.bg)
-        if background == "default":
-            background = self.textual_colors["background"]
+        foreground = self.detect_color(char.fg)
+        background = self.detect_color(char.bg)
+        if self.default_colors == "textual":
+            if background == "default":
+                background = self.textual_colors["background"]
+            if foreground == "default":
+                foreground = self.textual_colors["foreground"]
 
         style: Style
         try:
             style = Style(
-                color=self.fix_color(char.fg),
-                # bgcolor=background,
-                bgcolor=self.fix_color(char.bg),
+                color=foreground,
+                bgcolor=background,
                 bold=char.bold,
             )
         except ColorParseError as error:
-            # TODO: fish is using hex-colors without # / and elinks in 256-colors
-            #   RE: ([0-9a-f]{6})
-            style = None
             log.warning("color parse error:", error)
+            style = None
 
         return style
 
@@ -318,6 +313,7 @@ class Terminal(Widget, can_focus=True):
             True    if char styles are the same
             False   if char styles differ
         """
+
         if (
             given.fg == other.fg
             and given.bg == other.bg
@@ -334,6 +330,7 @@ class Terminal(Widget, can_focus=True):
 
     def char_style_default(self, char: Char) -> bool:
         """Returns True if the given char has a default style."""
+
         if (
             char.fg == "default"
             and char.bg == "default"
@@ -348,18 +345,37 @@ class Terminal(Widget, can_focus=True):
 
         return False
 
-    def fix_color(self, color: str) -> str:
-        """Fix wrong ANSI color names.
+    def detect_color(self, color: str) -> str:
+        """Tries to detect the correct Rich-Color based on a color name.
+
+        * Returns #<color> if <color> is a hex-definition without "#"
+        * Fixes wrong ANSI color names.
 
         Examples:
           * htop is using "brown" => not an ANSI color
         """
-        # OPTIMIZE: find a way to catch these errors and use a default color.
 
         if color == "brown":
             return "yellow"
 
+        if color == "brightblack":
+            # fish tabbing through recommendations
+            return "#808080"
+
+        if re.match("[0-9a-f]{6}", color, re.IGNORECASE):
+            return f"#{color}"
+
         return color
+
+    def detect_textual_colors(self) -> dict:
+        """Returns the currently used colors of textual depending on dark-mode."""
+
+        if self.app.dark:
+            color_system: ColorSystem = DEFAULT_COLORS["dark"]
+        else:
+            color_system: ColorSystem = DEFAULT_COLORS["light"]
+
+        return color_system.generate()
 
     def initial_display(self) -> TerminalDisplay:
         """Returns the display when initially creating the terminal or clearing it."""

@@ -41,6 +41,22 @@ pip install textual-terminal
 * Simple key handling (navigation, function keys)
 * Simple mouse tracking (click, scroll)
 
+## Options
+
+### `default_colors`
+
+By default, textual-terminal uses the colors defined by the system (not the
+Textual colors). To use the textual background and foreground for "default"
+colors, set the option `default_colors`
+
+```python
+Terminal(command="htop", default_colors="textual")
+```
+
+Note: This only applies to ANSI colors without an explicit setting, e.g. if the
+background is set to "red" by an application, it will stay red and the option
+will not have any effect.
+
 ## References
 
 This library is based on the

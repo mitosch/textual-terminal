@@ -23,6 +23,7 @@ class TerminalExampleApp(App):
         ("Q", "quit", "Exit"),
         ("1", "start_1", "Start Terminal 1"),
         ("2", "start_2", "Start Terminal 2"),
+        ("ctrl+d", "toggle_dark", "Toggle dark mode")
     ]
 
     DEFAULT_CSS = """
@@ -48,6 +49,12 @@ class TerminalExampleApp(App):
     COMMANDS = {
         "terminal_1": "htop -d10",
         "terminal_2": "bash",
+        # "terminal_2": "htop -d15",
+    }
+
+    COLORS = {
+        "terminal_1": "system",
+        "terminal_2": "textual",
     }
 
     def compose(self) -> ComposeResult:
@@ -73,7 +80,7 @@ class TerminalExampleApp(App):
 
         log("attach terminal with id:", name)
         self.app.mount(
-            Terminal(command=self.COMMANDS[name], id=name), after=f"#{name}_label"
+            Terminal(command=self.COMMANDS[name], id=name, default_colors=self.COLORS[name]), after=f"#{name}_label"
         )
 
     def start_terminal(self, name: str) -> None:
