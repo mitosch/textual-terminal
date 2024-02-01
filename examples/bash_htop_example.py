@@ -109,6 +109,12 @@ class TerminalExampleApp(App):
         self.attach_terminal("terminal_2")
         self.start_terminal("terminal_2")
 
+    def on_terminal_started(self, event: Terminal.Started) -> None:
+        log("terminal started:", event)
+
+    def on_terminal_stopped(self, event: Terminal.Stopped) -> None:
+        log("terminal stopped:", event)
+
 
 if __name__ == "__main__":
     app = TerminalExampleApp()
