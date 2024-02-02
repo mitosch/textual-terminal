@@ -30,6 +30,7 @@ from rich.style import Style
 from rich.color import ColorParseError
 
 from textual.widget import Widget
+from textual.message import Message
 from textual import events
 from textual.app import DEFAULT_COLORS
 
@@ -69,6 +70,16 @@ class Terminal(Widget, can_focus=True):
         background: $background;
     }
     """
+
+    class Started(Message):
+        """Posted after the terminal is started"""
+
+        pass
+
+    class Stopped(Message):
+        """Posted after the terminal is stopped"""
+
+        pass
 
     textual_colors: dict | None
 
@@ -145,6 +156,7 @@ class Terminal(Widget, can_focus=True):
         self.send_queue = self.emulator.recv_queue
         self.recv_queue = self.emulator.send_queue
         self.recv_task = asyncio.create_task(self.recv())
+        self.post_message(self.Started())
 
     def stop(self) -> None:
         if self.emulator is None:
@@ -156,6 +168,8 @@ class Terminal(Widget, can_focus=True):
 
         self.emulator.stop()
         self.emulator = None
+
+        self.post_message(self.Stopped())
 
     def render(self):
         return self._display
