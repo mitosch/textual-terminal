@@ -23,7 +23,7 @@ include = [
 
 [tool.poetry.dependencies]
 python = "^3.7"
-textual = ">=0.8.0"
+textual = ">=0.14.0"
 pyte = "^0.8.1"
 
 [tool.poetry.group.dev.dependencies]
